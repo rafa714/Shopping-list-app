@@ -1,17 +1,36 @@
 package com.entgldb.network.service
 
-import android.app.Service
-import android.content.Intent
-import android.os.IBinder
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
+import io.ktor.server.routing.routing
+import io.ktor.server.routing.post
+import io.ktor.server.request.receiveText
+import io.ktor.server.response.respondText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import android.util.Log
+import io.ktor.server.application.call
 
-/**
- * Foreground service stub for EntglDb P2P networking.
- * Full implementation will wire into the Ktor TCP/UDP layer.
- */
-class EntglDbService : Service() {
-    override fun onBind(intent: Intent?): IBinder? = null
+class EntglDbService(private val onUpdateReceived: (String) -> Unit) {
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        return START_STICKY
+    private val server = embeddedServer(Netty, port = 8080) {
+        routing {
+            post(path= "/update") {
+                val data = call.receiveText()
+                Log.d("EntglDbService", "Received update: $data")
+                onUpdateReceived(data)
+                call.respondText("OK")
+            }
+        }
+    }
+
+    suspend fun start() = withContext(Dispatchers.IO) {
+        server.start(wait = true)
+        Log.d("EntglDbService", "Server started on port 8080")
+    }
+
+    fun stop() {
+        server.stop(1000, 2000)
+        Log.d("EntglDbService", "Server stopped")
     }
 }

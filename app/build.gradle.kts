@@ -14,12 +14,13 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEa
 }
 
 configure<ApplicationExtension>{
-    compileSdk = 36
+    compileSdk = 37
     namespace = "com.entgldb.app"
 
     defaultConfig {
         applicationId = "com.entgldb.app"
         minSdk = 24
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
     }
@@ -36,7 +37,12 @@ configure<ApplicationExtension>{
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-
+    packaging {
+        resources {
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/io.netty.versions.properties"
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -58,7 +64,6 @@ dependencies {
     implementation("androidx.core:core-ktx:1.17.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
-    implementation("androidx.activity:activity-compose:1.12.2")
 
     // Compose
     implementation(platform("androidx.compose:compose-bom:2026.01.00"))
@@ -71,10 +76,10 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     // Kotlin Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
     
     // Kotlinx Serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     // Preferences DataStore
     implementation("androidx.datastore:datastore-preferences:1.2.0")
